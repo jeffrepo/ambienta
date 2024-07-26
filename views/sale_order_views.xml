@@ -1,0 +1,30 @@
+<odoo>
+     <record id="view_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="after">
+                <field name="type_id"/>
+                <field name="show_quotation"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
+                <field name="type_id"/>
+                <field name="show_quotation"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- imprimir reporte -->
+    <record id="view_order_form_cotizador" model="ir.ui.view">
+        <field name="name">sale.order.form.cotizador</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_quotation_send']" position="after">
+                <button name="%(action_report_saleorder_document)d" string="Cotizador" type="action" class="btn-primary"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
