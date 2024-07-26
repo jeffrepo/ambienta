@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_saleorder_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- imagen primera página -->
+                        <img t-att-src="'/ambienta/static/src/img/FORMATO COTI.png'" 
+                             alt="Cotización Ambienta" 
+                             style="max-width: 100%; height: auto%;" />
+
+
+                        <h2>Cotización de Pedido</h2>
+                        <p>Pedido: <span t-field="o.name"/></p>
+                        <p>Cliente: <span t-field="o.partner_id.name"/></p>
+                        <!-- Agrega más campos según sea necesario -->
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
