@@ -4,17 +4,108 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-call="web.external_layout">
-                    <div class="page">
-                        <!-- imagen primera página -->
-                        <img t-att-src="'/ambienta/static/src/img/FORMATO COTI.png'" 
-                             alt="Cotización Ambienta" 
-                             style="max-width: 100%; height: auto%;" />
+                    <div class="page" style="margin: 0; padding: 0; position: relative;">
+                        <!-- Imagen de fondo -->
+                        <div style="page-break-after: always; width: 100%; height: auto;">
+                            <img t-att-src="'/ambienta/static/src/img/FORMATO COTI.png'" 
+                                 alt="Cotización Ambienta"
+                                 style="width: 100%; height: auto; margin: 0; padding: 0;" />
+                        </div>
+                        
+                        <!-- Contenido del reporte -->
+                        <div style="padding: 10mm;">
+                            <h2 style="margin-top: 0;">Cotización de Pedido</h2>
+                            <p>Pedido: <span t-field="o.name"/></p>
+                            <p>Cliente: <span t-field="o.partner_id.name"/></p>
 
+                            <!-- Agregar la nueva sección de campos alineados -->
+                            <table style="width: 100%; margin-top: 20px;">
+                                <tr>
+                                    <td style="width: 50%;">
+                                        <strong>Contacto:</strong> <span t-field="o.partner_id.name"/><br/>
+                                        <strong>Correo:</strong> <span t-field="o.partner_id.email"/><br/>
+                                        <strong>Teléfono:</strong> <span t-field="o.partner_id.phone"/><br/>
+                                        <strong>Dirección:</strong> <span t-field="o.partner_id.street"/>
+                                    </td>
+                                    <td style="width: 50%; text-align: right;">
+                                        <strong>Fecha:</strong> <span t-esc="o.date_order"/><br/>
+                                        <strong>Cotización:</strong> <span t-field="o.name"/><br/>
+                                        <strong>Asesor:</strong> <span t-field="o.user_id.name"/>
+                                    </td>
+                                </tr>
+                            </table>
 
-                        <h2>Cotización de Pedido</h2>
-                        <p>Pedido: <span t-field="o.name"/></p>
-                        <p>Cliente: <span t-field="o.partner_id.name"/></p>
-                        <!-- Agrega más campos según sea necesario -->
+                            <!-- Agregar las secciones y líneas del pedido -->
+                            <table class="table table-condensed" style="width: 100%; margin-top: 20px;">
+                                <thead>
+                                    <tr>
+                                        <th>Sistema</th>
+                                        <th>Descripción</th>
+                                        <th style="text-align: right;">Precio Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="current_section" t-value="None"/>
+                                    <t t-foreach="o.order_line" t-as="line">
+                                        <t t-if="line.display_type == 'line_section'">
+                                            <tr>
+                                                <td colspan="3" style="background-color: #EFEFEF; font-weight: bold;">
+                                                    <span t-field="line.name"/>
+                                                </td>
+                                            </tr>
+                                            <t t-set="current_section" t-value="line.id"/>
+                                        </t>
+                                        <t t-if="line.display_type != 'line_section' and line.display_type != 'line_note' and line.show_quotation">
+                                            <tr>
+                                                <td t-if="line.type_id" style="padding-left: 20px;">
+                                                    <span t-field="line.type_id.name"/>
+                                                </td>
+                                                <td>
+                                                    <span t-field="line.name"/>
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <span t-field="line.price_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" style="padding-left: 40px;">
+                                                    <span t-field="line.name"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </tbody>
+                            </table>
+
+                            <!-- Totales -->
+                            <table class="table" style="margin-top: 20px;">
+                                <tr>
+                                    <td style="width: 70%;"></td>
+                                    <td style="width: 30%;">
+                                        <table class="table table-condensed">
+                                            <tr>
+                                                <td style="text-align: right;">TOTAL</td>
+                                                <td style="text-align: right;">
+                                                    <span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align: right;">Anticipo</td>
+                                                <td style="text-align: right;">
+                                                    <span t-esc="o.amount_total - (o.amount_total * 0.3)" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align: right;">PENDIENTE</td>
+                                                <td style="text-align: right;">
+                                                    <span t-esc="o.amount_total * 0.3" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </t>
             </t>
