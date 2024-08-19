@@ -43,6 +43,7 @@
                                 </thead>
                                 <tbody>
                                     <t t-set="current_section" t-value="None"/>
+                                    <t t-set="section_total" t-value="0.0"/>
                                     <t t-foreach="o.order_line" t-as="line">
                                         <t t-if="line.display_type == 'line_section'">
                                             <tr>
@@ -51,6 +52,7 @@
                                                 </td>
                                             </tr>
                                             <t t-set="current_section" t-value="line.id"/>
+                                            <t t-set="section_total" t-value="0.0"/>
                                         </t>
                                         <t t-if="line.display_type != 'line_section' and line.display_type != 'line_note' and line.show_quotation">
                                             <tr>
@@ -61,15 +63,25 @@
                                                     <span t-field="line.name"/>
                                                 </td>
                                                 <td style="text-align: right;">
-                                                    <span t-field="line.price_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="3" style="padding-left: 40px;">
-                                                    <span t-field="line.name"/>
+                                                    <!-- Mostrar el precio de la línea solo si el campo show_price de sale.order está marcado -->
+                                                    <t t-if="o.show_price">
+                                                        <span t-field="line.price_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                        <t t-set="section_total" t-value="section_total + line.price_total"/>
+                                                    </t>
                                                 </td>
                                             </tr>
                                         </t>
+                                        <!-- Mostrar el total de la sección al final de la misma -->
+                                        <!-- <t t-if="line.display_type == 'line_section' or line.id == o.order_line[-1].id">
+                                            <tr>
+                                                <td colspan="2" style="text-align: right; font-weight: bold;">
+                                                    Total Sección
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <span t-esc="section_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                        </t> -->
                                     </t>
                                 </tbody>
                             </table>
@@ -106,22 +118,6 @@
                     </div>
                     <div style="page-break-before: always;"></div>
                     <div class="page" style="padding: 10mm;">
-
-                        <table style="width: 100%; margin-top: 20px;">
-                                <tr>
-                                    <td style="width: 50%;">
-                                        <strong>Contacto:</strong> <span t-field="o.partner_id.name"/><br/>
-                                        <strong>Correo:</strong> <span t-field="o.partner_id.email"/><br/>
-                                        <strong>Teléfono:</strong> <span t-field="o.partner_id.phone"/><br/>
-                                        <strong>Dirección:</strong> <span t-field="o.partner_id.street"/>
-                                    </td>
-                                    <td style="width: 50%; text-align: right;">
-                                        <strong>Fecha:</strong> <span t-esc="o.date_order"/><br/>
-                                        <strong>Cotización:</strong> <span t-field="o.name"/><br/>
-                                        <strong>Asesor:</strong> <span t-field="o.user_id.name"/>
-                                    </td>
-                                </tr>
-                         </table>   
                         <p><strong>Tiempos de entrega:</strong> 6 semanas a partir de recepción de anticipo (70%).</p>
                         <p><strong>NOTAS:</strong> Se modificarán 7 cajas eléctricas. Se unificarán retornos de iluminación en los baños.</p>
                         <h5>CONDICIONES DE INSTALACIÓN:</h5>
@@ -148,9 +144,24 @@
                             </tr>
                         </table>
                         
-                        <div style="text-align: center; margin-top: 20px;">
-                            <img t-att-src="'/ambienta/static/src/img/FIRMA JR.png'" alt="Firma" style="width: 100%; height: auto;" />
-                        </div>
+                        <table style="width: 100%; margin-top: 20px;">
+                            <tr>
+                                <!-- Imagen de firma fija -->
+                                <td style="width: 50%; text-align: center;">
+                                    <img t-att-src="'/ambienta/static/src/img/Firma.png'" 
+                                         alt="Firma" 
+                                         style="width: 100%; height: auto;" />
+                                </td> 
+
+                                 <!-- Campo de firma del usuario -->
+                                <td style="width: 50%; text-align: center;">
+                                    <img t-att-src="o.user_id.signature_image and '/web/image/res.users/%s/signature_image' % (o.user_id.id)" 
+                                         alt="Signature" 
+                                         style="max-width: 100px; max-height: 50px;" />
+                                </td>
+                               
+                            </tr>
+                        </table>
                     </div>
                 </t>
             </t>
