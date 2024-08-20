@@ -12,10 +12,12 @@
     'website': '',
     'depends': ['sale', 'mrp'],
     'data': [
+        'data/paperformat_cotizador.xml',
         'report/sale_order_report_template.xml',
         'report/sale_order_report.xml',
         'security/ir.model.access.csv',
         'views/sale_order_views.xml',
+        'views/res_user_view.xml',       
         
     ],
     'installable': True,

@@ -4,17 +4,164 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-call="web.external_layout">
-                    <div class="page">
-                        <!-- imagen primera página -->
-                        <img t-att-src="'/ambienta/static/src/img/FORMATO COTI.png'" 
-                             alt="Cotización Ambienta" 
-                             style="max-width: 100%; height: auto%;" />
+                    <div class="page" style="margin: 0; padding: 0; position: relative;">
+                        <!-- Imagen de fondo -->
+                        <div style="page-break-after: always; width: 100%; height: auto;">
+                            <img t-att-src="'/ambienta/static/src/img/FORMATO COTI.png'" 
+                                 alt="Cotización Ambienta"
+                                 style="width: 100%; height: auto; margin: 0; padding: 0;" />
+                        </div>
+                        
+                        <!-- Contenido del reporte -->
+                        <div style="padding: 10mm;">
+                          
+                            <!-- Agregar la nueva sección de campos alineados -->
+                            <table style="width: 100%; margin-top: 20px;">
+                                <tr>
+                                    <td style="width: 50%;">
+                                        <strong>Contacto:</strong> <span t-field="o.partner_id.name"/><br/>
+                                        <strong>Correo:</strong> <span t-field="o.partner_id.email"/><br/>
+                                        <strong>Teléfono:</strong> <span t-field="o.partner_id.phone"/><br/>
+                                        <strong>Dirección:</strong> <span t-field="o.partner_id.street"/>
+                                    </td>
+                                    <td style="width: 50%; text-align: right;">
+                                        <strong>Fecha:</strong> <span t-esc="o.date_order"/><br/>
+                                        <strong>Cotización:</strong> <span t-field="o.name"/><br/>
+                                        <strong>Asesor:</strong> <span t-field="o.user_id.name"/>
+                                    </td>
+                                </tr>
+                            </table>
 
+                            <!-- Agregar las secciones y líneas del pedido -->
+                            <table class="table table-condensed" style="width: 100%; margin-top: 20px;">
+                                <thead>
+                                    <tr>
+                                        <th>Sistema</th>
+                                        <th>Descripción</th>
+                                        <th style="text-align: right;">Precio Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="current_section" t-value="None"/>
+                                    <t t-set="section_total" t-value="0.0"/>
+                                    <t t-foreach="o.order_line" t-as="line">
+                                        <t t-if="line.display_type == 'line_section'">
+                                            <tr>
+                                                <td colspan="3" style="background-color: #EFEFEF; font-weight: bold;">
+                                                    <span t-field="line.name"/>
+                                                </td>
+                                            </tr>
+                                            <t t-set="current_section" t-value="line.id"/>
+                                            <t t-set="section_total" t-value="0.0"/>
+                                        </t>
+                                        <t t-if="line.display_type != 'line_section' and line.display_type != 'line_note' and line.show_quotation">
+                                            <tr>
+                                                <td t-if="line.type_id" style="padding-left: 20px;">
+                                                    <span t-field="line.type_id.name"/>
+                                                </td>
+                                                <td>
+                                                    <span t-field="line.name"/>
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <!-- Mostrar el precio de la línea solo si el campo show_price de sale.order está marcado -->
+                                                    <t t-if="o.show_price">
+                                                        <span t-field="line.price_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                        <t t-set="section_total" t-value="section_total + line.price_total"/>
+                                                    </t>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <!-- Mostrar el total de la sección al final de la misma -->
+                                        <!-- <t t-if="line.display_type == 'line_section' or line.id == o.order_line[-1].id">
+                                            <tr>
+                                                <td colspan="2" style="text-align: right; font-weight: bold;">
+                                                    Total Sección
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <span t-esc="section_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                        </t> -->
+                                    </t>
+                                </tbody>
+                            </table>
 
-                        <h2>Cotización de Pedido</h2>
-                        <p>Pedido: <span t-field="o.name"/></p>
-                        <p>Cliente: <span t-field="o.partner_id.name"/></p>
-                        <!-- Agrega más campos según sea necesario -->
+                            <!-- Totales -->
+                            <table class="table" style="margin-top: 20px;">
+                                <tr>
+                                    <td style="width: 70%;"></td>
+                                    <td style="width: 30%;">
+                                        <table class="table table-condensed">
+                                            <tr>
+                                                <td style="text-align: right;">TOTAL</td>
+                                                <td style="text-align: right;">
+                                                    <span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align: right;">Anticipo</td>
+                                                <td style="text-align: right;">
+                                                    <span t-esc="o.amount_total - (o.amount_total * 0.3)" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align: right;">PENDIENTE</td>
+                                                <td style="text-align: right;">
+                                                    <span t-esc="o.amount_total * 0.3" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div style="page-break-before: always;"></div>
+                    <div class="page" style="padding: 10mm;">
+                        <p><strong>Tiempos de entrega:</strong> 6 semanas a partir de recepción de anticipo (70%).</p>
+                        <p><strong>NOTAS:</strong> Se modificarán 7 cajas eléctricas. Se unificarán retornos de iluminación en los baños.</p>
+                        <h5>CONDICIONES DE INSTALACIÓN:</h5>
+                        <p>1. El valor total expresado en la cotización puede variar según la especificación y/o cambios requeridos por el cliente.</p>
+                        <p>2. En el momento de realizar la liquidación final del proyecto, el valor puede variar y el cliente se compromete a cancelarlo en su totalidad.</p>
+                        <p>3. Se requiere del 70% de anticipo para procesar la orden e iniciar trabajos de instalación y el saldo restante al momento de la entrega del proyecto.</p>
+                        <p>4. El anticipo puede ser depositado en la cuenta GTQ 410-006981-6 Banco Industrial o USD 410-006983-2 Banco Industrial.</p>
+                        <p>5. Para depósitos o transferencias en Quetzales, se utilizará el tipo de cambio a la venta del día del Banco Industrial.</p>
+                        <p>6. Al momento de recibir el anticipo, el cliente acepta todas las condiciones expresadas en este contrato.</p>
+                        <p>7. La presente oferta tiene una validez de 10 días calendario y está sujeta a cambios.</p>
+
+                        <p><strong>Autorizo las condiciones de la presente,</strong></p>
+
+                        <table style="width: 100%; margin-top: 40px; text-align: center;">
+                            <tr>
+                                <td style="width: 50%;">
+                                    <p>________________________________________</p>
+                                    <p>Nombre y firma</p>
+                                </td>
+                                <td style="width: 50%;">
+                                    <p>________________________________________</p>
+                                    <p>Fecha</p>
+                                </td>
+                            </tr>
+                        </table>
+                        
+                        <table style="width: 100%; margin-top: 20px;">
+                            <tr>
+                                <!-- Imagen de firma fija -->
+                                <td style="width: 50%; text-align: center;">
+                                    <img t-att-src="'/ambienta/static/src/img/Firma.png'" 
+                                         alt="Firma" 
+                                         style="width: 100%; height: auto;" />
+                                </td> 
+
+                                 <!-- Campo de firma del usuario -->
+                                <td style="width: 50%; text-align: center;">
+                                    <img t-att-src="o.user_id.signature_image and '/web/image/res.users/%s/signature_image' % (o.user_id.id)" 
+                                         alt="Signature" 
+                                         style="max-width: 100px; max-height: 50px;" />
+                                </td>
+                               
+                            </tr>
+                        </table>
                     </div>
                 </t>
             </t>

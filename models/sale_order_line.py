@@ -5,6 +5,7 @@ class SaleOrderLine(models.Model):
 
     type_id = fields.Many2one('product.type', string="Tipo")
     show_quotation = fields.Boolean(string="Show Quotation")
+    show_price = fields.Boolean(string="Show Price")
 
     @api.onchange('type_id')
     def _onchange_type_id(self):

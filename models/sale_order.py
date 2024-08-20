@@ -3,6 +3,9 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    show_price = fields.Boolean(string="Show Price")
+ 
+
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
         self.create_manufacturing_orders()

@@ -12,6 +12,9 @@
                 <field name="type_id"/>
                 <field name="show_quotation"/>
             </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="show_price"/>
+            </xpath>
         </field>
     </record>
 
