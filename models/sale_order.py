@@ -3,7 +3,7 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    show_price = fields.Boolean(string="Show Price")
+    show_price = fields.Boolean(string="Mostrar precio")
  
 
     def action_confirm(self):
