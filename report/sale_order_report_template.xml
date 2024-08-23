@@ -56,8 +56,15 @@
                                         </t>
                                         <t t-if="line.display_type != 'line_section' and line.display_type != 'line_note' and line.show_quotation">
                                             <tr>
-                                                <td t-if="line.type_id" style="padding-left: 20px;">
-                                                    <span t-field="line.type_id.name"/>
+                                                <td style="padding-left: 20px;">
+                                                    <t t-if="line.type_id">
+                                                        <!-- Si el campo type_id está presente, mostrar su valor -->
+                                                        <span t-field="line.type_id.name"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <!-- Si el campo type_id no está presente, insertar un espacio invisible -->
+                                                        <span> </span>
+                                                    </t>
                                                 </td>
                                                 <td>
                                                     <span t-field="line.name"/>
@@ -71,18 +78,18 @@
                                                 </td>
                                             </tr>
                                         </t>
-                                        <!-- Mostrar el total de la sección al final de la misma -->
-                                        <!-- <t t-if="line.display_type == 'line_section' or line.id == o.order_line[-1].id">
+                                    </t>
+                                     <!-- Mostrar el total de la sección al final de la misma -->
+                                         <t t-if="line.display_type == 'line_section' or line.id == o.order_line[-1].id">
                                             <tr>
                                                 <td colspan="2" style="text-align: right; font-weight: bold;">
-                                                    Total Sección
+                                                       Subtotal
                                                 </td>
                                                 <td style="text-align: right;">
                                                     <span t-esc="section_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                                 </td>
                                             </tr>
-                                        </t> -->
-                                    </t>
+                                        </t>
                                 </tbody>
                             </table>
 
