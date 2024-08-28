@@ -10,6 +10,19 @@
                             <img t-att-src="'/ambienta/static/src/img/FORMATO COTI.png'" 
                                  alt="Cotización Ambienta"
                                  style="width: 100%; height: auto; margin: 0; padding: 0;" />
+
+                                  
+                            <!-- Agregar nombre de usuario logueado -->
+                            <div style="position: absolute; top: 150px; right: 230px; color: white; font-size: 25px;">
+                                <t t-esc="o.user_id.name" />
+                            </div>
+
+                            <!-- Agregar dirección de la empresa -->
+                            <div style="position: absolute; top: 200px; right: 40px; color: white; font-size: 23px;">
+                                <t t-esc="o.company_id.partner_id.street" />
+                            </div>
+
+
                         </div>
                         
                         <!-- Contenido del reporte -->
@@ -41,56 +54,71 @@
                                         <th style="text-align: right;">Precio Total</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <t t-set="current_section" t-value="None"/>
-                                    <t t-set="section_total" t-value="0.0"/>
-                                    <t t-foreach="o.order_line" t-as="line">
-                                        <t t-if="line.display_type == 'line_section'">
-                                            <tr>
-                                                <td colspan="3" style="background-color: #EFEFEF; font-weight: bold;">
-                                                    <span t-field="line.name"/>
-                                                </td>
-                                            </tr>
-                                            <t t-set="current_section" t-value="line.id"/>
-                                            <t t-set="section_total" t-value="0.0"/>
-                                        </t>
-                                        <t t-if="line.display_type != 'line_section' and line.display_type != 'line_note' and line.show_quotation">
-                                            <tr>
-                                                <td style="padding-left: 20px;">
-                                                    <t t-if="line.type_id">
-                                                        <!-- Si el campo type_id está presente, mostrar su valor -->
-                                                        <span t-field="line.type_id.name"/>
-                                                    </t>
-                                                    <t t-else="">
-                                                        <!-- Si el campo type_id no está presente, insertar un espacio invisible -->
-                                                        <span> </span>
-                                                    </t>
-                                                </td>
-                                                <td>
-                                                    <span t-field="line.name"/>
-                                                </td>
-                                                <td style="text-align: right;">
-                                                    <!-- Mostrar el precio de la línea solo si el campo show_price de sale.order está marcado -->
-                                                    <t t-if="o.show_price">
-                                                        <span t-field="line.price_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                                        <t t-set="section_total" t-value="section_total + line.price_total"/>
-                                                    </t>
-                                                </td>
-                                            </tr>
-                                        </t>
+                              <tbody>
+                                <t t-set="current_section" t-value="None"/>
+                                <t t-set="section_total" t-value="0.0"/>
+                                <t t-foreach="o.order_line" t-as="line">
+                                    <!-- Mostrar el subtotal al cambiar de sección, pero no en la última línea -->
+                                    <t t-if="current_section and line.display_type == 'line_section' and line.id != o.order_line[-1].id">
+                                        <!-- Mostrar el subtotal de la sección actual -->
+                                        <tr>
+                                            <td colspan="2" style="text-align: right; font-weight: bold;">
+                                                Subtotal
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <span t-esc="section_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                        <!-- Reiniciar el subtotal si es una nueva sección -->
+                                        <t t-set="section_total" t-value="0.0"/>
                                     </t>
-                                     <!-- Mostrar el total de la sección al final de la misma -->
-                                         <t t-if="line.display_type == 'line_section' or line.id == o.order_line[-1].id">
-                                            <tr>
-                                                <td colspan="2" style="text-align: right; font-weight: bold;">
-                                                       Subtotal
-                                                </td>
-                                                <td style="text-align: right;">
-                                                    <span t-esc="section_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                                </td>
-                                            </tr>
-                                        </t>
-                                </tbody>
+
+                                    <!-- Manejar el inicio de una nueva sección -->
+                                    <t t-if="line.display_type == 'line_section'">
+                                        <tr>
+                                            <td colspan="3" style="background-color: #EFEFEF; font-weight: bold;">
+                                                <span t-field="line.name"/>
+                                            </td>
+                                        </tr>
+                                        <t t-set="current_section" t-value="line.id"/>
+                                    </t>
+                                    
+                                    <!-- Manejar las líneas de productos normales -->
+                                    <t t-if="line.display_type != 'line_section' and line.display_type != 'line_note' and line.show_quotation">
+                                        <tr>
+                                            <td style="padding-left: 20px;">
+                                                <t t-if="line.type_id">
+                                                    <span t-field="line.type_id.name"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <span> </span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.name"/>
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <t t-if="o.show_price">
+                                                    <span t-field="line.price_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    <t t-set="section_total" t-value="section_total + line.price_total"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    
+                                    <!-- Verificar si la línea es la última para mostrar el subtotal final -->
+                                    <t t-if="line.id == o.order_line[-1].id and line.display_type != 'line_section'">
+                                        <tr>
+                                            <td colspan="2" style="text-align: right; font-weight: bold;">
+                                                Subtotal
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <span t-esc="section_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
                             </table>
 
                             <!-- Totales -->
