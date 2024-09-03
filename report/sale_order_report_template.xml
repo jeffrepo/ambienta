@@ -79,8 +79,8 @@
                                         </t>
                                         
                                         <!-- Manejar las líneas de productos normales -->
-                                        <t t-if="line.display_type != 'line_section' and line.display_type != 'line_note' and line.show_quotation">
-                                            <tr>
+                                        <t t-if="line.display_type != 'line_section' and line.display_type != 'line_note'">
+                                            <tr t-if="line.show_quotation">
                                                 <td style="padding-left: 20px;">
                                                     <t t-if="line.type_id">
                                                         <span t-field="line.type_id.name"/>
@@ -98,6 +98,7 @@
                                                     </t>
                                                 </td>
                                             </tr>
+                                            <!-- Sumar el total independientemente de si se muestra o no -->
                                             <t t-set="section_total" t-value="section_total + line.price_total"/>
                                         </t>
                                         
