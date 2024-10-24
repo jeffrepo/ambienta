@@ -1,8 +1,10 @@
 <odoo>
     <template id="report_saleorder_document">
         <t t-call="web.html_container">
+            <t t-set="data_report_margin_top" t-value="12"/>
+            <t t-set="data_report_header_spacing" t-value="4"/>
             <t t-foreach="docs" t-as="o">
-                <t t-call="web.external_layout">
+                <t t-call="web.internal_layout">
                     <div class="page" style="margin: 0; padding: 0; position: relative;">
                         <!-- Imagen de fondo -->
                         <div style="page-break-after: always; width: 100%; height: auto;">
@@ -44,7 +46,7 @@
                             <table class="table table-condensed" style="width: 100%; margin-top: 20px;">
                                 <thead>
                                     <tr>
-                                        <th>Sistema</th>
+                                        <th>Cantidad</th>
                                         <th>Descripción</th>
                                         <th style="text-align: right;">Precio Total</th>
                                     </tr>
@@ -82,12 +84,8 @@
                                         <t t-if="line.display_type != 'line_section' and line.display_type != 'line_note'">
                                             <tr t-if="line.show_quotation">
                                                 <td style="padding-left: 20px;">
-                                                    <t t-if="line.type_id">
-                                                        <span t-field="line.type_id.name"/>
-                                                    </t>
-                                                    <t t-else="">
-                                                        <span> </span>
-                                                    </t>
+                                                    <!-- Mostrando el campo product_uom_qty para la cantidad -->
+                                                    <span t-field="line.product_uom_qty"/>
                                                 </td>
                                                 <td>
                                                     <span t-field="line.name"/>
@@ -101,6 +99,7 @@
                                             <!-- Sumar el total independientemente de si se muestra o no -->
                                             <t t-set="section_total" t-value="section_total + line.price_total"/>
                                         </t>
+
                                         
                                         <!-- Verificar si la línea es la última para mostrar el subtotal final -->
                                         <t t-if="line.id == o.order_line[-1].id and line.display_type != 'line_section'">
@@ -120,7 +119,7 @@
                             <!-- Totales -->
                             <table class="table" style="margin-top: 20px;">
                                 <tr>
-                                    <td style="width: 70%;"></td>
+                                    <td style="width: 70%;"/>
                                     <td style="width: 30%;">
                                         <table class="table table-condensed">
                                             <tr>
@@ -147,7 +146,7 @@
                             </table>
                         </div>
                     </div>
-                    <div style="page-break-before: always;"></div>
+                    <div style="page-break-before: always;"/>
                     <div class="page" style="padding: 10mm;">
                         <p><strong>Tiempos de entrega:</strong> 6 semanas a partir de recepción de anticipo (70%).</p>
                         <p><strong>NOTAS:</strong> Se modificarán 7 cajas eléctricas. Se unificarán retornos de iluminación en los baños.</p>
