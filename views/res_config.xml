@@ -1,0 +1,22 @@
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form_inherit_labor_product" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.labor.product</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//block[@id='connectors_setting_container']" position="after">
+                    <!-- Nueva sección Producto Mano de Obra -->
+                    <block title="Producto Mano de Obra" id="labor_product_setting_container">
+                        <setting id="labor_product_setting" string="Producto de Mano de Obra">
+                            <field name="labor_product_id"/>
+                            <div class="text-muted mt8">
+                                Selecciona el producto que representa la mano de obra.
+                            </div>
+                        </setting>
+                    </block>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

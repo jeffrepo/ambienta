@@ -1,22 +1,24 @@
 <odoo>
     <template id="report_saleorder_document">
         <t t-call="web.html_container">
+            <t t-set="data_report_margin_top" t-value="12"/>
+            <t t-set="data_report_header_spacing" t-value="4"/>
             <t t-foreach="docs" t-as="o">
-                <t t-call="web.external_layout">
+                <t t-call="web.internal_layout">
                     <div class="page" style="margin: 0; padding: 0; position: relative;">
                         <!-- Imagen de fondo -->
-                        <div style="page-break-after: always; width: 100%; height: auto;">
+                        <div style="page-break-after: always; position: relative; width: 100%; height: auto;">
                             <img t-att-src="'/ambienta/static/src/img/FORMATO COTI.png'" 
-                                 alt="Cotización Ambienta"
-                                 style="width: 100%; height: auto; margin: 0; padding: 0;" />
+                                alt="Cotización Ambienta"
+                                style="width: 110%; height: auto; margin: 0; padding: 0; display: block;" />
 
-                            <!-- Agregar nombre de usuario logueado -->
+                            <!-- nombre de usuario logueado -->
                             <div style="position: absolute; top: 150px; right: 230px; color: white; font-size: 25px;">
                                 <t t-esc="o.user_id.name" />
                             </div>
 
-                            <!-- Agregar dirección de la empresa -->
-                            <div style="position: absolute; top: 200px; right: 40px; color: white; font-size: 23px;">
+                            <!-- dirección de la empresa -->
+                            <div style="position: absolute; top: 200px; right: 90px; color: white; font-size: 23px;">
                                 <t t-esc="o.company_id.partner_id.street" />
                             </div>
                         </div>
@@ -24,7 +26,7 @@
                         <!-- Contenido del reporte -->
                         <div style="padding: 10mm;">
                             <!-- Agregar la nueva sección de campos alineados -->
-                            <table style="width: 100%; margin-top: 20px;">
+                            <table class="table table-borderless" style="width: 100%; margin-top: 20px;">
                                 <tr>
                                     <td style="width: 50%;">
                                         <strong>Contacto:</strong> <span t-field="o.partner_id.name"/><br/>
@@ -41,10 +43,10 @@
                             </table>
 
                             <!-- Agregar las secciones y líneas del pedido -->
-                            <table class="table table-condensed" style="width: 100%; margin-top: 20px;">
+                            <table class="table table-condensed table-borderless" style="width: 100%; margin-top: 20px;">
                                 <thead>
                                     <tr>
-                                        <th>Sistema</th>
+                                        <th>Cantidad</th>
                                         <th>Descripción</th>
                                         <th style="text-align: right;">Precio Total</th>
                                     </tr>
@@ -53,7 +55,10 @@
                                     <t t-set="current_section" t-value="None"/>
                                     <t t-set="section_total" t-value="0.0"/>
                                     <t t-foreach="o.order_line" t-as="line">
-                                        <!-- Mostrar el subtotal al cambiar de sección, pero no en la última línea -->
+                                        <!-- Insertar salto de página si 'page_break' es True -->
+                                        <t t-if="line.page_break">
+                                            <tr style="page-break-before: always;"></tr>
+                                        </t>
                                         <t t-if="current_section and line.display_type == 'line_section' and line.id != o.order_line[-1].id">
                                             <!-- Mostrar el subtotal de la sección actual -->
                                             <tr>
@@ -70,7 +75,7 @@
 
                                         <!-- Manejar el inicio de una nueva sección -->
                                         <t t-if="line.display_type == 'line_section'">
-                                            <tr>
+                                            <tr t-att-style="line.page_break and 'page-break-before: always;' or ''">
                                                 <td colspan="3" style="background-color: #EFEFEF; font-weight: bold;">
                                                     <span t-field="line.name"/>
                                                 </td>
@@ -82,12 +87,8 @@
                                         <t t-if="line.display_type != 'line_section' and line.display_type != 'line_note'">
                                             <tr t-if="line.show_quotation">
                                                 <td style="padding-left: 20px;">
-                                                    <t t-if="line.type_id">
-                                                        <span t-field="line.type_id.name"/>
-                                                    </t>
-                                                    <t t-else="">
-                                                        <span> </span>
-                                                    </t>
+                                                    <!-- Mostrando el campo product_uom_qty para la cantidad -->
+                                                    <span t-field="line.product_uom_qty"/>
                                                 </td>
                                                 <td>
                                                     <span t-field="line.name"/>
@@ -101,7 +102,16 @@
                                             <!-- Sumar el total independientemente de si se muestra o no -->
                                             <t t-set="section_total" t-value="section_total + line.price_total"/>
                                         </t>
-                                        
+
+                                        <!-- Manejar las líneas de notas -->
+                                        <t t-if="line.display_type == 'line_note'">
+                                            <tr>
+                                                <td colspan="3" style="padding-left: 20px; font-style: italic; color: #555;">
+                                                    <span t-field="line.name"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+
                                         <!-- Verificar si la línea es la última para mostrar el subtotal final -->
                                         <t t-if="line.id == o.order_line[-1].id and line.display_type != 'line_section'">
                                             <tr>
@@ -118,9 +128,9 @@
                             </table>
 
                             <!-- Totales -->
-                            <table class="table" style="margin-top: 20px;">
+                            <table class="table table-borderless" style="margin-top: 20px;">
                                 <tr>
-                                    <td style="width: 70%;"></td>
+                                    <td style="width: 70%;"/>
                                     <td style="width: 30%;">
                                         <table class="table table-condensed">
                                             <tr>
@@ -147,7 +157,7 @@
                             </table>
                         </div>
                     </div>
-                    <div style="page-break-before: always;"></div>
+                    <div style="page-break-before: always;"/>
                     <div class="page" style="padding: 10mm;">
                         <p><strong>Tiempos de entrega:</strong> 6 semanas a partir de recepción de anticipo (70%).</p>
                         <p><strong>NOTAS:</strong> Se modificarán 7 cajas eléctricas. Se unificarán retornos de iluminación en los baños.</p>
@@ -162,7 +172,7 @@
 
                         <p><strong>Autorizo las condiciones de la presente,</strong></p>
 
-                        <table style="width: 100%; margin-top: 40px; text-align: center;">
+                        <table class="table table-borderless" style="width: 100%; margin-top: 80px; text-align: center;">
                             <tr>
                                 <td style="width: 50%;">
                                     <p>________________________________________</p>
@@ -175,7 +185,7 @@
                             </tr>
                         </table>
                         
-                        <table style="width: 100%; margin-top: 20px;">
+                        <table class="table table-borderless" style="width: 100%; margin-top: 20px;">
                             <tr>
                                 <!-- Imagen de firma fija -->
                                 <td style="width: 50%; text-align: center;">
@@ -188,7 +198,7 @@
                                 <td style="width: 50%; text-align: center;">
                                     <img t-att-src="o.user_id.signature_image and '/web/image/res.users/%s/signature_image' % (o.user_id.id)" 
                                          alt="Signature" 
-                                         style="max-width: 100px; max-height: 50px;" />
+                                         style="max-width: 300px; max-height: 200px;" />
                                 </td>
                                
                             </tr>

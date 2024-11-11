@@ -7,10 +7,12 @@
             <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="after">
                 <field name="type_id"/>
                 <field name="show_quotation"/>
+                <field name="page_break"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
                 <field name="type_id"/>
                 <field name="show_quotation"/>
+                <field name="page_break"/>
             </xpath>
             <xpath expr="//field[@name='payment_term_id']" position="after">
                 <field name="show_price"/>
