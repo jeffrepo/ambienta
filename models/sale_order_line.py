@@ -23,22 +23,22 @@ class SaleOrderLine(models.Model):
         order_line = super(SaleOrderLine, self).create(vals)
         _logger.info("Línea de pedido creada: %s", order_line)
 
-        # Obtener el producto configurado como mano de obra desde la configuración
-        labor_product_id = self.env['ir.config_parameter'].sudo().get_param('sale.labor_product_id')
-        _logger.info("Producto de mano de obra obtenido de la configuración: %s", labor_product_id)
+        # Obtener el producto asociado a la línea de pedido y verificar si tiene configurado un producto de mano de obra
+        labor_product_id = order_line.product_id.labor_product_id
+        _logger.info("Producto de mano de obra configurado en el producto original: %s", labor_product_id)
 
-        # Solo proceder si el producto no es el de mano de obra y la línea es un producto (display_type is None)
-        if labor_product_id and int(labor_product_id) != order_line.product_id.id and not order_line.display_type:
+        # Solo proceder si existe un producto de mano de obra configurado y la línea no es de un producto de tipo mano de obra (display_type is None)
+        if labor_product_id and not order_line.display_type:
             # Crear una línea de pedido adicional para el producto de mano de obra justo después de la línea de pedido original
             labor_line = self.create({
                 'order_id': order_line.order_id.id,
-                'product_id': int(labor_product_id),
+                'product_id': labor_product_id.id,
                 'product_uom_qty': 1,
-                'price_unit': self.env['product.product'].browse(int(labor_product_id)).lst_price,
-                'sequence': order_line.sequence + 1  # Colocar la línea inmediatamente después del producto original
+                'price_unit': labor_product_id.lst_price,
+                'sequence': order_line.sequence + 1 
             })
             _logger.info("Línea de mano de obra creada justo después del producto: %s", labor_line)
         else:
-            _logger.info("No se añadió la línea de mano de obra porque el producto es el mismo configurado en labor_product_id o la línea no es un producto.")
+            _logger.info("No se añadió la línea de mano de obra porque el producto no tiene una mano de obra configurada.")
 
         return order_line
