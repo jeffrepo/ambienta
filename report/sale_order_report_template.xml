@@ -1,10 +1,10 @@
 <odoo>
     <template id="report_saleorder_document">
-        <t t-call="web.html_container">
+        <t t-call="web.html_container" data-report-header="False" data-report-footer="False">
             <t t-set="data_report_margin_top" t-value="12"/>
             <t t-set="data_report_header_spacing" t-value="4"/>
             <t t-foreach="docs" t-as="o">
-                <t t-call="web.internal_layout">
+                <t t-call="web.basic_layout">
                     <div class="page" style="margin: 0; padding: 0; position: relative;">
                         <!-- Imagen de fondo -->
                         <div style="page-break-after: always; position: relative; width: 100%; height: auto;">

@@ -1,0 +1,12 @@
+<odoo>
+    <record id="view_product_form_inherit_labor_product" model="ir.ui.view">
+        <field name="name">product.product.form.inherit.labor.product</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='standard_price_uom']" position="after">
+                <field name="labor_product_id" string="Mano de Obra"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
