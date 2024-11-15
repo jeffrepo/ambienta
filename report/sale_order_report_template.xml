@@ -198,7 +198,7 @@
                                 <td style="width: 50%; text-align: center;">
                                     <img t-att-src="o.user_id.signature_image and '/web/image/res.users/%s/signature_image' % (o.user_id.id)" 
                                          alt="Signature" 
-                                         style="max-width: 300px; max-height: 200px;" />
+                                         style="max-width: 400px; max-height: 250px;" />
                                 </td>
                                
                             </tr>
